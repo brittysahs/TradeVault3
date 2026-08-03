@@ -142,7 +142,7 @@ function renderLogin() {
 
     const { error } = await client.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${location.origin}/auth/callback` }
+      options: { emailRedirectTo: location.origin }
     });
 
     message.classList.remove("hidden");
