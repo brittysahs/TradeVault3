@@ -192,7 +192,8 @@ function renderApp() {
           </div>
           <nav>
             <button data-tab="dashboard">⌂ Dashboard</button>
-            <button data-tab="trades">↗ Trades</button>
+            <button data-tab="demo">↗ Demo Trades</button>
+            <button data-tab="live">↗ Live Trades</button>
             <button data-tab="calculator">÷ Risk Calculator</button>
             <button data-tab="playbook">▤ Playbook</button>
           </nav>
@@ -245,7 +246,8 @@ function renderApp() {
 function renderTab() {
   const titles = {
     dashboard: "Dashboard",
-    trades: "Trade Journal",
+    demo: "Demo Trade Journal",
+    live: "Live Trade Journal",
     calculator: "Risk Calculator",
     playbook: "Strategy Playbook"
   };
@@ -256,7 +258,8 @@ function renderTab() {
   );
 
   if (activeTab === "dashboard") renderDashboard();
-  if (activeTab === "trades") renderTrades();
+  if (activeTab === "demo") renderTrades("demo");
+  if (activeTab === "live") renderTrades("live");
   if (activeTab === "calculator") renderCalculator();
   if (activeTab === "playbook") renderPlaybook();
 }
@@ -341,11 +344,17 @@ function ruleBars(fields) {
   }).join("");
 }
 
-function renderTrades() {
+function renderTrades(accountType) { 
+  const accountTrades = trades.filter(
+   trade => (trade.account_type || "demo") === accountType
+  );
+  const journalTitle = accountType === "demo"
+   ? "Demo Trades"
+   : "Live Trades";
   document.getElementById("page-content").innerHTML = `
     <section class="panel">
       <div class="panel-title responsive">
-        <div><p class="eyebrow">JOURNAL</p><h3>All Trades</h3></div>
+        <div><p class="eyebrow">JOURNAL</p><h3>${journalTitle}</h3>></div>
         <div class="filters">
           <input id="search" placeholder="Search symbol or strategy">
           <select id="result-filter">
@@ -356,19 +365,20 @@ function renderTrades() {
           </select>
         </div>
       </div>
-      <div id="trade-table-wrap">${tradeTable(trades, false)}</div>
+      <div id="trade-table-wrap">${tradeTable(accountTrades, false)}</div>
     </section>`;
 
-  document.getElementById("search").oninput = filterTrades;
-  document.getElementById("result-filter").onchange = filterTrades;
+  document.getElementById("search").oninput = () => filterTrades(accountType);
+  document.getElementById("result-filter").onchange = () => filterTrades(accountType);
   bindDeleteButtons();
 }
 
-function filterTrades() {
+function filterTrades(accountType) {
   const query = document.getElementById("search").value.toLowerCase();
   const filter = document.getElementById("result-filter").value;
 
   const list = trades.filter(trade => {
+    if ((trade.account_type || "demo") !== accountType) return false;
     const textMatch =
       trade.symbol.toLowerCase().includes(query) ||
       trade.strategy.toLowerCase().includes(query);
