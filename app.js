@@ -3,7 +3,7 @@ const app = document.getElementById("app");
 let client = null;
 let currentUser = null;
 let trades = [];
-let activeTab = "dashboard";
+let activeTab = localStorage.getItem("tradevault-active-tab") || "dashboard";
 
 const money = value => new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -222,6 +222,7 @@ function renderApp() {
   document.querySelectorAll("[data-tab]").forEach(button => {
     button.addEventListener("click", () => {
       activeTab = button.dataset.tab;
+      localStorage.setItem("tradevault-active-tab", activeTab);
       document.getElementById("sidebar").classList.remove("open");
       renderTab();
     });
