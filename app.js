@@ -513,7 +513,14 @@ function openTradeModal() {
         </div>
         <form id="trade-form">
           <div class="modal-body">
-            <div class="form-grid">
+            <div class="form-grid"> 
+              <label>Account Type
+                <select name="account_type" required>
+                  <option value="demo" selected>Demo</option>
+                  <option value="live">Live</option>
+                </select>
+              </label>
+              
               <label>Trade Date<input name="trade_date" type="date" value="${new Date().toISOString().slice(0,10)}" required></label>
               <label>Symbol<input name="symbol" required placeholder="NQ, QQQ, AAPL…"></label>
               <label>Market<select name="market"><option>NASDAQ</option><option>Options</option><option>Stocks</option><option>Forex</option><option>Crypto</option></select></label>
