@@ -354,7 +354,7 @@ function renderTrades(accountType) {
   document.getElementById("page-content").innerHTML = `
     <section class="panel">
       <div class="panel-title responsive">
-        <div><p class="eyebrow">JOURNAL</p><h3>${journalTitle}</h3>></div>
+        <div><p class="eyebrow">JOURNAL</p><h3>${journalTitle}</h3></div>
         <div class="filters">
           <input id="search" placeholder="Search symbol or strategy">
           <select id="result-filter">
