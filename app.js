@@ -390,7 +390,7 @@ function tradeTable(list, compact) {
     <div class="table-scroll">
       <table>
         <thead><tr>
-          <th>Date</th><th>Symbol</th><th>Side</th><th>Strategy</th>
+          <th>Date</th><th>Symbol</th><th>Account</th><th>Side</th><th>Strategy</th>
           <th>P/L</th><th>R</th><th>Grade</th>${compact ? "" : "<th></th>"}
         </tr></thead>
         <tbody>
@@ -401,6 +401,7 @@ function tradeTable(list, compact) {
               <tr>
                 <td>${trade.trade_date}</td>
                 <td><strong>${escapeHtml(trade.symbol)}</strong></td>
+                <td><span class="grade">${escapeHtml((trade.account_type || "demo").toUpperCase())}</span></td>
                 <td>${trade.direction}</td>
                 <td>${escapeHtml(trade.strategy)}</td>
                 <td class="${result === null ? "muted" : result >= 0 ? "positive" : "negative"}">${result === null ? "Open" : money(result)}</td>
@@ -408,7 +409,7 @@ function tradeTable(list, compact) {
                 <td><span class="grade">${escapeHtml(trade.grade)}</span></td>
                 ${compact ? "" : `<td><button class="icon-delete" data-delete="${trade.id}">Delete</button></td>`}
               </tr>`;
-          }).join("") : `<tr><td colspan="8" class="muted">No trades found.</td></tr>`}
+          }).join("") : `<tr><td colspan="${compact ? 8 : 9}" class="muted">No trades found.</td>`}
         </tbody>
       </table>
     </div>`;
