@@ -4,6 +4,7 @@ let client = null;
 let currentUser = null;
 let trades = [];
 let activeTab = localStorage.getItem("tradevault-active-tab") || "dashboard";
+let dashboardAccount = localStorage.getItem("tradevault-dashboard-account") || "demo";
 
 const money = value => new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -265,7 +266,10 @@ function renderTab() {
 }
 
 function renderDashboard() {
-  const closed = trades.filter(trade => pnl(trade) !== null);
+  const dashboardTrades = trades.filter(
+    trade => (trade.account_type || "demo") === dashboardAccount
+  );
+  const closed = dashboardTrades.filter(trade => pnl(trade) !== null);
   const wins = closed.filter(trade => pnl(trade) > 0);
   const losses = closed.filter(trade => pnl(trade) < 0);
   const net = closed.reduce((sum, trade) => sum + pnl(trade), 0);
@@ -280,12 +284,18 @@ function renderDashboard() {
     "level_identified","structure_confirmed","candle_confirmed",
     "risk_approved","reward_approved","session_approved"
   ];
-  const discipline = trades.length
-    ? trades.reduce((sum, trade) => sum + fields.filter(field => trade[field]).length, 0)
-      / (trades.length * fields.length) * 100
+  const discipline = dashboardTrades.length
+    ? dashboardTrades.reduce(
+       (sum, trade) => sum + fields.filter(field => trade[field]).length,
+       0
+     ) / (dashboardTrades.length * fields.length) * 100
     : 0;
 
   document.getElementById("page-content").innerHTML = `
+   <div class="dashboard-switch">
+      <button id="dashboard-demo" class="${dashboardAccount === "demo" ? "active" : ""}">Demo</button>
+      <button id="dashboard-live" class="${dashboardAccount === "live" ? "active" : ""}">Live</button>
+   </div>
     <section class="hero">
       <div>
         <p class="eyebrow light">PERFORMANCE OVERVIEW</p>
@@ -307,22 +317,33 @@ function renderDashboard() {
       </article>
       <article class="panel">
         <div class="panel-title"><div><p class="eyebrow">PROCESS</p><h3>Rule Adherence</h3></div></div>
-        <div class="rule-list">${ruleBars(fields)}</div>
+        <div class="rule-list">${ruleBars(fields, dashboardTrades)}</div>
       </article>
     </section>
     <article class="panel recent-panel">
       <div class="panel-title"><div><p class="eyebrow">RECENT</p><h3>Latest Trades</h3></div></div>
-      ${tradeTable(trades.slice(0, 5), true)}
+      ${tradeTable(dashboardTrades.slice(0, 5), true)}
     </article>`;
 
-  drawChart(closed);
+  document.getElementById("dashboard-demo").onclick = () => {
+   dashboardAccount = "demo";
+   localStorage.setItem("tradevault-dashboard-account", dashboardAccount);
+   renderDashboard();
+  };
+ document.getElementById("dashboard-live").onclick = () => {
+  dashboardAccount = "live";
+  localStorage.setItem("tradevault-dashboard-account", dashboardAccount);
+  renderDashboard();
+ };
+ drawChart(closed); 
 }
+
 
 function metric(label, value, note) {
   return `<article class="metric"><span>${label}</span><strong>${value}</strong><small>${note}</small></article>`;
 }
 
-function ruleBars(fields) {
+function ruleBars(fields, dashboardTrades) {
   const labels = {
     level_identified:"Level identified",
     structure_confirmed:"Structure confirmed",
@@ -333,9 +354,9 @@ function ruleBars(fields) {
   };
 
   return fields.map(field => {
-    const score = trades.length
-      ? trades.filter(trade => trade[field]).length / trades.length * 100
-      : 0;
+    const score = dashboardTrades.length
+       ? dashboardTrades.filter(trade => trade[field]).length / dashboardTrades.length * 100
+       : 0; 
     return `
       <div>
         <div class="rule-label"><span>${labels[field]}</span><strong>${score.toFixed(0)}%</strong></div>
