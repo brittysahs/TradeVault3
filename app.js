@@ -453,7 +453,7 @@ function bindDeleteButtons() {
       const { error } = await client.from("trades").delete().eq("id", button.dataset.delete);
       if (error) return alert(error.message);
       trades = trades.filter(trade => trade.id !== button.dataset.delete);
-      renderTrades();
+      renderTab();
     };
   });
 }
